@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Color Blender</title>
+    <style>
+        .colorBox {
+            border: 1px solid black;
+            margin-bottom: 5px;
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Color Blender</h1>
+    <div id="input-selections">
+        <p>Enter two colors in hexcode format:</p>
+        <form>
+            <label for="color1">Color 1: #</label>
+            <input type="text" id="color1" name="color1" onkeydown="return validateInput()"><br>
+            <label for="color2">Color 2: #</label>
+            <input type="text" id="color2" name="color2" onkeydown="return validateInput()"><br>
+        </form>
+        <button id="compute-button" onclick="appendColorBox()"> Compute Blended Color! </button>
+        <button id="clear-button" onclick="clearInput()"> Clear Inputs! </button>
+    </div>
+    <div id="showColor">
+
+    </div>
+  </body>
+  <script>
+    let input1 = document.getElementById("color1")
+    let input2 = document.getElementById("color2")
+    let colorDiv = document.getElementById("showColor");
+
+
+    let clearInput = function() {
+        input1.value = "";
+        input2.value = "";
+        colorDiv.innerHTML = "";
+    }
+
+    let validateInput = function() {
+        if (event.key === "Backspace") {
+            return true;
+        }
+
+        if (event.target.value.length === 6) {
+            return false;
+        }
+
+        let key = event.key.toLowerCase()
+        let validCharacters = "0123456789abcdef".split("")
+
+        if (!validCharacters.includes(key)) {
+            return false;
+        }
+        return true;
+    }
+
+    let hexToObject = function(hexValue) {
+        let red = hexValue.slice(0, 2);
+        let green = hexValue.slice(2, 4);
+        let blue = hexValue.slice(4, 6);
+        let returnObject = {
+            "red": red,
+            "green": green,
+            "blue": blue
+        };
+        return returnObject;
+    }
+
+    let appendZeroIfNeeded = function(numString) {
+        if (numString.length === 2) {
+            return numString;
+        }
+        return '0' + numString;
+    }
+
+    let blendColors = function(text1, text2) {
+        let color1 = hexToObject(text1);
+        let color2 = hexToObject(text2);
+        let red = Math.ceil((parseInt(color1.red, 16) + parseInt(color2.red, 16)) / 2);
+        let green = Math.ceil((parseInt(color1.green, 16) + parseInt(color2.green, 16)) / 2);
+        let blue = Math.ceil((parseInt(color1.blue, 16) + parseInt(color2.blue, 16)) / 2);
+        return '#' + appendZeroIfNeeded(red.toString(16)) + appendZeroIfNeeded(green.toString(16)) + appendZeroIfNeeded(blue.toString(16));
+    }
+
+    let appendColorBox = function() {
+        if (input1.value.length !== 6 || input2.value.length !== 6) {
+            colorDiv.innerText = "Both inputs must be a hexcode with length 6!";
+            return;
+        }
+        colorDiv.innerHTML = "";
+
+        let colorBox1 = document.createElement("div");
+        colorBox1.className = "colorBox";
+        colorBox1.innerText = "Color 1: #" + input1.value;
+        colorBox1.style.backgroundColor = '#' + input1.value;
+
+        let colorBox2 = document.createElement("div");
+        colorBox2.className = "colorBox";
+        colorBox2.innerText = "Color 2: #" + input2.value;
+        colorBox2.style.backgroundColor = '#' + input2.value;
+
+        let colorBox3 = document.createElement("div");
+        colorBox3.className = "colorBox";
+        colorBox3.innerText = "Blended Color: " + blendColors(input1.value, input2.value);
+        colorBox3.style.backgroundColor = blendColors(input1.value, input2.value);
+
+        colorDiv.appendChild(colorBox1);
+        colorDiv.appendChild(colorBox2);
+        colorDiv.appendChild(colorBox3);
+    }
+  </script>
+</html>
